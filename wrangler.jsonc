@@ -18,8 +18,8 @@
   "d1_databases": [
     {
       "binding": "D1",
-      "database_id": "DATABASE_ID",
-      "database_name": "my-app",
+      "database_id": "e7c6a687-cb73-448c-a200-a1bf9933d052",
+      "database_name": "chalkidiki-blog",
       "remote": true,
     },
   ],
