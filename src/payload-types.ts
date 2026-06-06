@@ -69,6 +69,9 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    properties: Property;
+    reviews: Review;
+    enquiries: Enquiry;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +81,9 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    properties: PropertiesSelect<false> | PropertiesSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -87,8 +93,22 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    siteSettings: SiteSetting;
+    navigation: Navigation;
+    footer: Footer;
+    home: Home;
+    locationPage: LocationPage;
+    contactPage: ContactPage;
+  };
+  globalsSelect: {
+    siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    navigation: NavigationSelect<false> | NavigationSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+    home: HomeSelect<false> | HomeSelect<true>;
+    locationPage: LocationPageSelect<false> | LocationPageSelect<true>;
+    contactPage: ContactPageSelect<false> | ContactPageSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -149,6 +169,11 @@ export interface User {
 export interface Media {
   id: number;
   alt: string;
+  caption?: string | null;
+  /**
+   * Optional low-quality placeholder populated by the media import pipeline.
+   */
+  blurDataURL?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -158,6 +183,167 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "properties".
+ */
+export interface Property {
+  id: number;
+  name: string;
+  slug: string;
+  order?: number | null;
+  tag?: string | null;
+  numeral?: string | null;
+  hero: {
+    /**
+     * Shown at 768px and above and used as the video poster/fallback.
+     */
+    imageDesktop: number | Media;
+    /**
+     * Portrait-friendly crop shown below 768px. Falls back to the desktop image.
+     */
+    imageMobile?: (number | null) | Media;
+    /**
+     * Optional R2 URL for the desktop hero video.
+     */
+    videoDesktop?: string | null;
+    /**
+     * Optional lighter R2 video URL for phones.
+     */
+    videoMobile?: string | null;
+    /**
+     * Keep off to prevent phones from downloading hero video.
+     */
+    playOnMobile?: boolean | null;
+    /**
+     * Marks this hero as the above-the-fold image the front end should preload.
+     */
+    priority?: boolean | null;
+    kicker?: string | null;
+    title?: string | null;
+    sub?: string | null;
+  };
+  summary?: string | null;
+  overview?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  stats?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  amenities?:
+    | {
+        iconKey?:
+          | (
+              | 'bed'
+              | 'bath'
+              | 'pool'
+              | 'view'
+              | 'kitchen'
+              | 'garden'
+              | 'wifi'
+              | 'parking'
+              | 'accessible'
+              | 'bbq'
+              | 'concierge'
+              | 'chef'
+            )
+          | null;
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  gallery?:
+    | {
+        image: number | Media;
+        alt: string;
+        layout?: ('l' | 'p' | 's') | null;
+        height?: ('h1' | 'h2' | 'h3' | 'h4' | 'h5') | null;
+        id?: string | null;
+      }[]
+    | null;
+  map: {
+    /**
+     * Pin latitude, for example 40.1969.
+     */
+    latitude: number;
+    /**
+     * Pin longitude, for example 23.7761.
+     */
+    longitude: number;
+    zoom?: number | null;
+    /**
+     * Pin tooltip or place name.
+     */
+    label?: string | null;
+    /**
+     * Optional directions target. Falls back to latitude and longitude.
+     */
+    directionsQuery?: string | null;
+    /**
+     * Static map image shown before the visitor chooses to load the interactive map.
+     */
+    staticPreview?: (number | null) | Media;
+  };
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  property: number | Property;
+  authorName: string;
+  authorLocation?: string | null;
+  source?: ('booking' | 'google' | 'airbnb' | 'direct') | null;
+  score?: number | null;
+  quote: string;
+  date?: string | null;
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enquiries".
+ */
+export interface Enquiry {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string | null;
+  preferredProperty?: ('either' | 'avista-villa' | 'avista-private-resort') | null;
+  arrival?: string | null;
+  departure?: string | null;
+  guests?: number | null;
+  message: string;
+  status?: ('new' | 'replied' | 'archived') | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -190,6 +376,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'properties';
+        value: number | Property;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'enquiries';
+        value: number | Enquiry;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -261,6 +459,8 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  caption?: T;
+  blurDataURL?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -270,6 +470,108 @@ export interface MediaSelect<T extends boolean = true> {
   filesize?: T;
   width?: T;
   height?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "properties_select".
+ */
+export interface PropertiesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  order?: T;
+  tag?: T;
+  numeral?: T;
+  hero?:
+    | T
+    | {
+        imageDesktop?: T;
+        imageMobile?: T;
+        videoDesktop?: T;
+        videoMobile?: T;
+        playOnMobile?: T;
+        priority?: T;
+        kicker?: T;
+        title?: T;
+        sub?: T;
+      };
+  summary?: T;
+  overview?: T;
+  stats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  amenities?:
+    | T
+    | {
+        iconKey?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  gallery?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        layout?: T;
+        height?: T;
+        id?: T;
+      };
+  map?:
+    | T
+    | {
+        latitude?: T;
+        longitude?: T;
+        zoom?: T;
+        label?: T;
+        directionsQuery?: T;
+        staticPreview?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  property?: T;
+  authorName?: T;
+  authorLocation?: T;
+  source?: T;
+  score?: T;
+  quote?: T;
+  date?: T;
+  featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enquiries_select".
+ */
+export interface EnquiriesSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  phone?: T;
+  preferredProperty?: T;
+  arrival?: T;
+  departure?: T;
+  guests?: T;
+  message?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -310,6 +612,595 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "siteSettings".
+ */
+export interface SiteSetting {
+  id: number;
+  brandName?: string | null;
+  tagline?: string | null;
+  contactEmail?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  copyright?: string | null;
+  locationSlogan?: string | null;
+  weather?: {
+    latitude?: number | null;
+    longitude?: number | null;
+  };
+  defaultSeo?: {
+    titleTemplate?: string | null;
+    description?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation".
+ */
+export interface Navigation {
+  id: number;
+  leftLinks?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  rightLinks?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  brandBlurb?: string | null;
+  columns?:
+    | {
+        heading: string;
+        links?:
+          | {
+              label: string;
+              href: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home".
+ */
+export interface Home {
+  id: number;
+  hero: {
+    /**
+     * Shown at 768px and above and used as the video poster/fallback.
+     */
+    imageDesktop: number | Media;
+    /**
+     * Portrait-friendly crop shown below 768px. Falls back to the desktop image.
+     */
+    imageMobile?: (number | null) | Media;
+    /**
+     * Optional R2 URL for the desktop hero video.
+     */
+    videoDesktop?: string | null;
+    /**
+     * Optional lighter R2 video URL for phones.
+     */
+    videoMobile?: string | null;
+    /**
+     * Keep off to prevent phones from downloading hero video.
+     */
+    playOnMobile?: boolean | null;
+    /**
+     * Marks this hero as the above-the-fold image the front end should preload.
+     */
+    priority?: boolean | null;
+    kicker?: string | null;
+    title?: string | null;
+    sub?: string | null;
+  };
+  intro?: {
+    lead?: string | null;
+    statement?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  gallery?:
+    | {
+        image: number | Media;
+        alt: string;
+        layout?: ('l' | 'p' | 's') | null;
+        height?: ('h1' | 'h2' | 'h3' | 'h4' | 'h5') | null;
+        id?: string | null;
+      }[]
+    | null;
+  services?:
+    | {
+        iconKey?:
+          | (
+              | 'bed'
+              | 'bath'
+              | 'pool'
+              | 'view'
+              | 'kitchen'
+              | 'garden'
+              | 'wifi'
+              | 'parking'
+              | 'accessible'
+              | 'bbq'
+              | 'concierge'
+              | 'chef'
+            )
+          | null;
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  locationSummary?: string | null;
+  locationFacts?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  cta?: {
+    title?: string | null;
+    body?: string | null;
+    buttonLabel?: string | null;
+  };
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "locationPage".
+ */
+export interface LocationPage {
+  id: number;
+  hero: {
+    /**
+     * Shown at 768px and above and used as the video poster/fallback.
+     */
+    imageDesktop: number | Media;
+    /**
+     * Portrait-friendly crop shown below 768px. Falls back to the desktop image.
+     */
+    imageMobile?: (number | null) | Media;
+    /**
+     * Optional R2 URL for the desktop hero video.
+     */
+    videoDesktop?: string | null;
+    /**
+     * Optional lighter R2 video URL for phones.
+     */
+    videoMobile?: string | null;
+    /**
+     * Keep off to prevent phones from downloading hero video.
+     */
+    playOnMobile?: boolean | null;
+    /**
+     * Marks this hero as the above-the-fold image the front end should preload.
+     */
+    priority?: boolean | null;
+    kicker?: string | null;
+    title?: string | null;
+    sub?: string | null;
+  };
+  overview?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  locationFacts?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  map: {
+    /**
+     * Pin latitude, for example 40.1969.
+     */
+    latitude: number;
+    /**
+     * Pin longitude, for example 23.7761.
+     */
+    longitude: number;
+    zoom?: number | null;
+    /**
+     * Pin tooltip or place name.
+     */
+    label?: string | null;
+    /**
+     * Optional directions target. Falls back to latitude and longitude.
+     */
+    directionsQuery?: string | null;
+    /**
+     * Static map image shown before the visitor chooses to load the interactive map.
+     */
+    staticPreview?: (number | null) | Media;
+  };
+  crossLinks?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contactPage".
+ */
+export interface ContactPage {
+  id: number;
+  hero: {
+    /**
+     * Shown at 768px and above and used as the video poster/fallback.
+     */
+    imageDesktop: number | Media;
+    /**
+     * Portrait-friendly crop shown below 768px. Falls back to the desktop image.
+     */
+    imageMobile?: (number | null) | Media;
+    /**
+     * Optional R2 URL for the desktop hero video.
+     */
+    videoDesktop?: string | null;
+    /**
+     * Optional lighter R2 video URL for phones.
+     */
+    videoMobile?: string | null;
+    /**
+     * Keep off to prevent phones from downloading hero video.
+     */
+    playOnMobile?: boolean | null;
+    /**
+     * Marks this hero as the above-the-fold image the front end should preload.
+     */
+    priority?: boolean | null;
+    kicker?: string | null;
+    title?: string | null;
+    sub?: string | null;
+  };
+  invitation?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  map: {
+    /**
+     * Pin latitude, for example 40.1969.
+     */
+    latitude: number;
+    /**
+     * Pin longitude, for example 23.7761.
+     */
+    longitude: number;
+    zoom?: number | null;
+    /**
+     * Pin tooltip or place name.
+     */
+    label?: string | null;
+    /**
+     * Optional directions target. Falls back to latitude and longitude.
+     */
+    directionsQuery?: string | null;
+    /**
+     * Static map image shown before the visitor chooses to load the interactive map.
+     */
+    staticPreview?: (number | null) | Media;
+  };
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "siteSettings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  brandName?: T;
+  tagline?: T;
+  contactEmail?: T;
+  phone?: T;
+  address?: T;
+  copyright?: T;
+  locationSlogan?: T;
+  weather?:
+    | T
+    | {
+        latitude?: T;
+        longitude?: T;
+      };
+  defaultSeo?:
+    | T
+    | {
+        titleTemplate?: T;
+        description?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation_select".
+ */
+export interface NavigationSelect<T extends boolean = true> {
+  leftLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  rightLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  brandBlurb?: T;
+  columns?:
+    | T
+    | {
+        heading?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home_select".
+ */
+export interface HomeSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        imageDesktop?: T;
+        imageMobile?: T;
+        videoDesktop?: T;
+        videoMobile?: T;
+        playOnMobile?: T;
+        priority?: T;
+        kicker?: T;
+        title?: T;
+        sub?: T;
+      };
+  intro?:
+    | T
+    | {
+        lead?: T;
+        statement?: T;
+      };
+  gallery?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        layout?: T;
+        height?: T;
+        id?: T;
+      };
+  services?:
+    | T
+    | {
+        iconKey?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  locationSummary?: T;
+  locationFacts?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  cta?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        buttonLabel?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "locationPage_select".
+ */
+export interface LocationPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        imageDesktop?: T;
+        imageMobile?: T;
+        videoDesktop?: T;
+        videoMobile?: T;
+        playOnMobile?: T;
+        priority?: T;
+        kicker?: T;
+        title?: T;
+        sub?: T;
+      };
+  overview?: T;
+  locationFacts?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  map?:
+    | T
+    | {
+        latitude?: T;
+        longitude?: T;
+        zoom?: T;
+        label?: T;
+        directionsQuery?: T;
+        staticPreview?: T;
+      };
+  crossLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contactPage_select".
+ */
+export interface ContactPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        imageDesktop?: T;
+        imageMobile?: T;
+        videoDesktop?: T;
+        videoMobile?: T;
+        playOnMobile?: T;
+        priority?: T;
+        kicker?: T;
+        title?: T;
+        sub?: T;
+      };
+  invitation?: T;
+  map?:
+    | T
+    | {
+        latitude?: T;
+        longitude?: T;
+        zoom?: T;
+        label?: T;
+        directionsQuery?: T;
+        staticPreview?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

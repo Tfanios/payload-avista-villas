@@ -1,7 +1,9 @@
-import { getPayload, Payload } from 'payload'
-import config from '@/payload.config'
+// @vitest-environment node
 
-import { describe, it, beforeAll, expect } from 'vitest'
+import { getPayload, type Payload } from 'payload'
+import config, { disposeLocalCloudflareContext } from '@/payload.config'
+
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 let payload: Payload
 
@@ -11,10 +13,59 @@ describe('API', () => {
     payload = await getPayload({ config: payloadConfig })
   })
 
-  it('fetches users', async () => {
-    const users = await payload.find({
-      collection: 'users',
+  afterAll(async () => {
+    await payload?.destroy()
+    await disposeLocalCloudflareContext()
+  })
+
+  it('registers the public content collections and globals', () => {
+    expect(payload.config.collections.map(({ slug }) => slug)).toEqual(
+      expect.arrayContaining(['properties', 'reviews', 'enquiries', 'media']),
+    )
+    expect(payload.config.globals.map(({ slug }) => slug)).toEqual(
+      expect.arrayContaining([
+        'siteSettings',
+        'navigation',
+        'footer',
+        'home',
+        'locationPage',
+        'contactPage',
+      ]),
+    )
+  })
+
+  it('allows public property reads', async () => {
+    const properties = await payload.find({
+      collection: 'properties',
+      overrideAccess: false,
     })
-    expect(users).toBeDefined()
+
+    expect(properties.docs).toBeDefined()
+  })
+
+  it('allows public enquiry creation but protects enquiry reads', async () => {
+    const enquiry = await payload.create({
+      collection: 'enquiries',
+      overrideAccess: false,
+      data: {
+        name: 'Integration Test',
+        email: 'integration@example.com',
+        message: 'Please send details about the villas.',
+      },
+    })
+
+    expect(enquiry.status).toBe('new')
+
+    await expect(
+      payload.find({
+        collection: 'enquiries',
+        overrideAccess: false,
+      }),
+    ).rejects.toThrow()
+
+    await payload.delete({
+      collection: 'enquiries',
+      id: enquiry.id,
+    })
   })
 })

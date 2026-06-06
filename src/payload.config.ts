@@ -10,6 +10,15 @@ import { r2Storage } from '@payloadcms/storage-r2'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Enquiries } from './collections/Enquiries'
+import { Properties } from './collections/Properties'
+import { Reviews } from './collections/Reviews'
+import { ContactPage } from './globals/ContactPage'
+import { Footer } from './globals/Footer'
+import { Home } from './globals/Home'
+import { LocationPage } from './globals/LocationPage'
+import { Navigation } from './globals/Navigation'
+import { SiteSettings } from './globals/SiteSettings'
 import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
@@ -42,6 +51,7 @@ const cloudflareLogger = {
   silent: () => {},
 } as unknown as PayloadLogger
 
+let localCloudflareContext: (CloudflareContext & { dispose?: () => Promise<void> }) | undefined
 const cloudflare = await getCloudflareContextForPayload()
 
 export default buildConfig({
@@ -51,7 +61,8 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [Users, Media, Properties, Reviews, Enquiries],
+  globals: [SiteSettings, Navigation, Footer, Home, LocationPage, ContactPage],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -60,6 +71,7 @@ export default buildConfig({
   db: sqliteD1Adapter({
     binding: cloudflare.env.D1,
     prodMigrations: migrations,
+    push: false,
   }),
   logger: isProduction ? cloudflareLogger : undefined,
   plugins: [
@@ -89,29 +101,34 @@ function getCloudflareContextForPayload(): Promise<CloudflareContext> {
 }
 
 function createBuildTimeBinding<T>(name: string): T {
-  return new Proxy(
-    (): undefined => undefined,
-    {
-      apply: () => {
-        throw new Error(`${name} binding is not available while Next.js is building.`)
-      },
-      get: (_target, property): unknown => {
-        if (property === 'then') {
-          return undefined
-        }
-
-        return createBuildTimeBinding(`${name}.${String(property)}`)
-      },
+  return new Proxy((): undefined => undefined, {
+    apply: () => {
+      throw new Error(`${name} binding is not available while Next.js is building.`)
     },
-  ) as T
+    get: (_target, property): unknown => {
+      if (property === 'then') {
+        return undefined
+      }
+
+      return createBuildTimeBinding(`${name}.${String(property)}`)
+    },
+  }) as T
 }
 
-function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
-  return import(/* webpackIgnore: true */ `${'__wrangler'.replaceAll('_', '')}`).then(
-    ({ getPlatformProxy }) =>
-      getPlatformProxy({
-        environment: process.env.CLOUDFLARE_ENV,
-        remoteBindings: isProduction,
-      } satisfies GetPlatformProxyOptions),
+async function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
+  const { getPlatformProxy } = await import(
+    /* webpackIgnore: true */ `${'__wrangler'.replaceAll('_', '')}`
   )
+  const context = await getPlatformProxy({
+    remoteBindings: isProduction,
+  } satisfies GetPlatformProxyOptions)
+
+  localCloudflareContext = context
+
+  return context
+}
+
+export async function disposeLocalCloudflareContext(): Promise<void> {
+  await localCloudflareContext?.dispose?.()
+  localCloudflareContext = undefined
 }
