@@ -5,6 +5,10 @@ import { linkFields } from '../fields/shared'
 
 export const Navigation: GlobalConfig = {
   slug: 'navigation',
+  label: 'Navigation',
+  admin: {
+    group: 'Site',
+  },
   access: {
     read: canReadPublicly,
     update: isAuthenticated,

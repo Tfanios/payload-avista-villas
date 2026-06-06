@@ -4,6 +4,10 @@ import { canReadPublicly, isAuthenticated } from '../access/isAuthenticated'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'siteSettings',
+  label: 'Site Settings',
+  admin: {
+    group: 'Site',
+  },
   access: {
     read: canReadPublicly,
     update: isAuthenticated,

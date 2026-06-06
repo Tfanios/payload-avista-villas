@@ -18,11 +18,11 @@ anti-references) — no availability calendars or payments.
 
 - **Runtime:** Payload 3 (a Next.js app) on **Cloudflare Workers**, deployed via the **OpenNext**
   Cloudflare adapter (`@opennextjs/cloudflare`). Serves the admin UI + REST/GraphQL API.
-- **Database:** Cloudflare **D1** (SQLite) via `@payloadcms/db-sqlite` — the main DB. The D1 binding
-  (`env.DB`) is provided by the Worker; for local dev use a libSQL file. Follow Payload's SQLite/D1
-  docs for the exact binding wiring. _(Fallback only if you ever outgrow D1: Postgres via Cloudflare
+- **Database:** Cloudflare **D1** (SQLite) via `@payloadcms/db-d1-sqlite` — the main DB. The D1 binding
+  (`env.D1`) is provided by the Worker. Follow Payload's D1 docs for the exact binding wiring.
+  _(Fallback only if you ever outgrow D1: Postgres via Cloudflare
   **Hyperdrive** or Neon's HTTP driver. **MongoDB is not viable on Workers.**)_
-- **Media:** Cloudflare **R2** via `@payloadcms/storage-s3` (R2 is S3-compatible). R2 already hosts the
+- **Media:** Cloudflare **R2** via `@payloadcms/storage-r2`. R2 already hosts the
   site's hero video, so all assets stay in one place.
 - **Email (optional · undecided):** the enquiry _notification_ needs an **HTTP email adapter**
   (Resend / Postmark / SendGrid) — Workers can't send SMTP. **Not a blocker:** every enquiry saves to
@@ -333,8 +333,8 @@ Enable CORS for the front-end origin if you let the form POST directly instead o
 ```ts
 // payload.config.ts (Payload 3.x — deployed to Cloudflare Workers via @opennextjs/cloudflare)
 import { buildConfig } from 'payload'
-import { sqliteAdapter } from '@payloadcms/db-sqlite' // Cloudflare D1
-import { s3Storage } from '@payloadcms/storage-s3' // Cloudflare R2 (S3-compatible)
+import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite'
+import { r2Storage } from '@payloadcms/storage-r2'
 import { resendAdapter } from '@payloadcms/email-resend' // HTTP email (optional — provider undecided; no SMTP on Workers)
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 
@@ -349,11 +349,12 @@ import { Home } from './globals/Home'
 import { LocationPage } from './globals/LocationPage'
 import { ContactPage } from './globals/ContactPage'
 
+const cloudflare = await getCloudflareContextForPayload()
+
 export default buildConfig({
   editor: lexicalEditor(),
-  // Dev: a local libSQL file. Prod: Cloudflare D1 — wire the adapter to the Worker's D1
-  // binding (env.DB) per Payload's SQLite/D1 docs.
-  db: sqliteAdapter({ client: { url: process.env.DATABASE_URL ?? 'file:./avista.db' } }),
+  // getCloudflareContextForPayload resolves the Worker's D1 and R2 bindings.
+  db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
   collections: [Properties, Reviews, Enquiries, Media],
   globals: [SiteSettings, Navigation, Footer, Home, LocationPage, ContactPage],
   // Email provider undecided — Resend shown as a placeholder. Omit this whole block (and the import)
@@ -364,14 +365,9 @@ export default buildConfig({
     apiKey: process.env.RESEND_API_KEY || '',
   }),
   plugins: [
-    s3Storage({
+    r2Storage({
       collections: { media: true },
-      bucket: process.env.R2_BUCKET || 'avista',
-      config: {
-        endpoint: process.env.R2_ENDPOINT, // https://<account>.r2.cloudflarestorage.com
-        region: 'auto',
-        credentials: { accessKeyId: process.env.R2_KEY!, secretAccessKey: process.env.R2_SECRET! },
-      },
+      bucket: cloudflare.env.R2,
     }),
   ],
 })

@@ -13,6 +13,7 @@ import {
 export const Properties: CollectionConfig = {
   slug: 'properties',
   admin: {
+    group: 'Content',
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'order'],
   },

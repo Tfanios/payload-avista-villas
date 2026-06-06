@@ -5,6 +5,7 @@ import { isAuthenticated } from '../access/isAuthenticated'
 export const Enquiries: CollectionConfig = {
   slug: 'enquiries',
   admin: {
+    group: 'Operations',
     useAsTitle: 'name',
     defaultColumns: ['name', 'email', 'preferredProperty', 'status', 'createdAt'],
   },

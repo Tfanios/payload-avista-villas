@@ -34,6 +34,35 @@ describe('API', () => {
     )
   })
 
+  it('groups page and site globals clearly in the admin panel', () => {
+    const globalGroups = Object.fromEntries(
+      payload.config.globals.map(({ admin, slug }) => [slug, admin?.group]),
+    )
+
+    expect(globalGroups).toMatchObject({
+      home: 'Pages',
+      locationPage: 'Pages',
+      contactPage: 'Pages',
+      siteSettings: 'Site',
+      navigation: 'Site',
+      footer: 'Site',
+    })
+  })
+
+  it('keeps the disabled R2 direct-upload handler out of the admin bundle', () => {
+    const r2ClientUploadHandler = '@payloadcms/storage-r2/client#R2ClientUploadHandler'
+    const providers = payload.config.admin.components.providers ?? []
+
+    expect(payload.config.admin.dependencies?.[r2ClientUploadHandler]).toBeUndefined()
+    expect(
+      providers.some((provider) =>
+        typeof provider === 'string'
+          ? provider === r2ClientUploadHandler
+          : Boolean(provider && provider.path === r2ClientUploadHandler),
+      ),
+    ).toBe(false)
+  })
+
   it('allows public property reads', async () => {
     const properties = await payload.find({
       collection: 'properties',

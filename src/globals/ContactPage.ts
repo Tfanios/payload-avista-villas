@@ -6,6 +6,10 @@ import { heroFields, seoFields } from '../fields/shared'
 
 export const ContactPage: GlobalConfig = {
   slug: 'contactPage',
+  label: 'Contact Page',
+  admin: {
+    group: 'Pages',
+  },
   access: {
     read: canReadPublicly,
     update: isAuthenticated,

@@ -5,6 +5,7 @@ import { isAuthenticated } from '../access/isAuthenticated'
 export const Reviews: CollectionConfig = {
   slug: 'reviews',
   admin: {
+    group: 'Content',
     useAsTitle: 'authorName',
     defaultColumns: ['authorName', 'property', 'score', 'featured'],
   },

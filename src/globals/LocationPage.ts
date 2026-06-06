@@ -6,6 +6,10 @@ import { heroFields, linkFields, locationFactFields, seoFields } from '../fields
 
 export const LocationPage: GlobalConfig = {
   slug: 'locationPage',
+  label: 'Location Page',
+  admin: {
+    group: 'Pages',
+  },
   access: {
     read: canReadPublicly,
     update: isAuthenticated,

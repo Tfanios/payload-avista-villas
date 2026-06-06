@@ -5,6 +5,10 @@ import { linkFields } from '../fields/shared'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
+  label: 'Footer',
+  admin: {
+    group: 'Site',
+  },
   access: {
     read: canReadPublicly,
     update: isAuthenticated,

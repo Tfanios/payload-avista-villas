@@ -11,6 +11,10 @@ import {
 
 export const Home: GlobalConfig = {
   slug: 'home',
+  label: 'Home Page',
+  admin: {
+    group: 'Pages',
+  },
   access: {
     read: canReadPublicly,
     update: isAuthenticated,
