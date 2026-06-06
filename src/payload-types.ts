@@ -220,8 +220,14 @@ export interface Property {
      * Marks this hero as the above-the-fold image the front end should preload.
      */
     priority?: boolean | null;
+    /**
+     * Small line displayed above the title.
+     */
     kicker?: string | null;
     title?: string | null;
+    /**
+     * Supporting line shown beneath the title.
+     */
     sub?: string | null;
   };
   summary?: string | null;
@@ -242,7 +248,13 @@ export interface Property {
   } | null;
   stats?:
     | {
+        /**
+         * The figure, e.g. "5 min".
+         */
         value: string;
+        /**
+         * What the figure refers to, e.g. "To the beach".
+         */
         label: string;
         id?: string | null;
       }[]
@@ -273,8 +285,17 @@ export interface Property {
   gallery?:
     | {
         image: number | Media;
+        /**
+         * Describes the image for accessibility and SEO.
+         */
         alt: string;
+        /**
+         * Aspect ratio used in the gallery grid.
+         */
         layout?: ('l' | 'p' | 's') | null;
+        /**
+         * How tall the tile renders.
+         */
         height?: ('h1' | 'h2' | 'h3' | 'h4' | 'h5') | null;
         id?: string | null;
       }[]
@@ -303,8 +324,17 @@ export interface Property {
     staticPreview?: (number | null) | Media;
   };
   seo?: {
+    /**
+     * Shown in browser tabs and search results. Aim for under 60 characters.
+     */
     title?: string | null;
+    /**
+     * Search result snippet. Aim for 150–160 characters.
+     */
     description?: string | null;
+    /**
+     * Preview image used when the page is shared on social media (1200×630 recommended).
+     */
     ogImage?: (number | null) | Media;
   };
   updatedAt: string;
@@ -646,14 +676,26 @@ export interface Navigation {
   id: number;
   leftLinks?:
     | {
+        /**
+         * Visible link text.
+         */
         label: string;
+        /**
+         * Destination URL or path, e.g. /contact.
+         */
         href: string;
         id?: string | null;
       }[]
     | null;
   rightLinks?:
     | {
+        /**
+         * Visible link text.
+         */
         label: string;
+        /**
+         * Destination URL or path, e.g. /contact.
+         */
         href: string;
         id?: string | null;
       }[]
@@ -673,7 +715,13 @@ export interface Footer {
         heading: string;
         links?:
           | {
+              /**
+               * Visible link text.
+               */
               label: string;
+              /**
+               * Destination URL or path, e.g. /contact.
+               */
               href: string;
               id?: string | null;
             }[]
@@ -690,6 +738,9 @@ export interface Footer {
  */
 export interface Home {
   id: number;
+  /**
+   * The full-width banner at the top of the page.
+   */
   hero: {
     /**
      * Shown at 768px and above and used as the video poster/fallback.
@@ -715,11 +766,23 @@ export interface Home {
      * Marks this hero as the above-the-fold image the front end should preload.
      */
     priority?: boolean | null;
+    /**
+     * Small line displayed above the title.
+     */
     kicker?: string | null;
     title?: string | null;
+    /**
+     * Supporting line shown beneath the title.
+     */
     sub?: string | null;
   };
+  /**
+   * Opening statement shown below the hero.
+   */
   intro?: {
+    /**
+     * Short lead-in sentence.
+     */
     lead?: string | null;
     statement?: {
       root: {
@@ -737,17 +800,35 @@ export interface Home {
       [k: string]: unknown;
     } | null;
   };
+  /**
+   * Images shown in the page gallery, in order.
+   */
   gallery?:
     | {
         image: number | Media;
+        /**
+         * Describes the image for accessibility and SEO.
+         */
         alt: string;
+        /**
+         * Aspect ratio used in the gallery grid.
+         */
         layout?: ('l' | 'p' | 's') | null;
+        /**
+         * How tall the tile renders.
+         */
         height?: ('h1' | 'h2' | 'h3' | 'h4' | 'h5') | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Highlighted services or amenities.
+   */
   services?:
     | {
+        /**
+         * Icon displayed alongside the service.
+         */
         iconKey?:
           | (
               | 'bed'
@@ -769,22 +850,46 @@ export interface Home {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Intro paragraph for the location section.
+   */
   locationSummary?: string | null;
+  /**
+   * Short stats about the location, e.g. distance to the beach.
+   */
   locationFacts?:
     | {
+        /**
+         * The figure, e.g. "5 min".
+         */
         value: string;
+        /**
+         * What the figure refers to, e.g. "To the beach".
+         */
         label: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Closing prompt that encourages visitors to get in touch.
+   */
   cta?: {
     title?: string | null;
     body?: string | null;
     buttonLabel?: string | null;
   };
   seo?: {
+    /**
+     * Shown in browser tabs and search results. Aim for under 60 characters.
+     */
     title?: string | null;
+    /**
+     * Search result snippet. Aim for 150–160 characters.
+     */
     description?: string | null;
+    /**
+     * Preview image used when the page is shared on social media (1200×630 recommended).
+     */
     ogImage?: (number | null) | Media;
   };
   updatedAt?: string | null;
@@ -796,6 +901,9 @@ export interface Home {
  */
 export interface LocationPage {
   id: number;
+  /**
+   * The full-width banner at the top of the page.
+   */
   hero: {
     /**
      * Shown at 768px and above and used as the video poster/fallback.
@@ -821,10 +929,19 @@ export interface LocationPage {
      * Marks this hero as the above-the-fold image the front end should preload.
      */
     priority?: boolean | null;
+    /**
+     * Small line displayed above the title.
+     */
     kicker?: string | null;
     title?: string | null;
+    /**
+     * Supporting line shown beneath the title.
+     */
     sub?: string | null;
   };
+  /**
+   * Introductory description of the location.
+   */
   overview?: {
     root: {
       type: string;
@@ -840,13 +957,25 @@ export interface LocationPage {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Short stats about the location, e.g. distance to the beach.
+   */
   locationFacts?:
     | {
+        /**
+         * The figure, e.g. "5 min".
+         */
         value: string;
+        /**
+         * What the figure refers to, e.g. "To the beach".
+         */
         label: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Interactive map pin and directions.
+   */
   map: {
     /**
      * Pin latitude, for example 40.1969.
@@ -870,16 +999,34 @@ export interface LocationPage {
      */
     staticPreview?: (number | null) | Media;
   };
+  /**
+   * Up to two links to related pages.
+   */
   crossLinks?:
     | {
+        /**
+         * Visible link text.
+         */
         label: string;
+        /**
+         * Destination URL or path, e.g. /contact.
+         */
         href: string;
         id?: string | null;
       }[]
     | null;
   seo?: {
+    /**
+     * Shown in browser tabs and search results. Aim for under 60 characters.
+     */
     title?: string | null;
+    /**
+     * Search result snippet. Aim for 150–160 characters.
+     */
     description?: string | null;
+    /**
+     * Preview image used when the page is shared on social media (1200×630 recommended).
+     */
     ogImage?: (number | null) | Media;
   };
   updatedAt?: string | null;
@@ -891,6 +1038,9 @@ export interface LocationPage {
  */
 export interface ContactPage {
   id: number;
+  /**
+   * The full-width banner at the top of the page.
+   */
   hero: {
     /**
      * Shown at 768px and above and used as the video poster/fallback.
@@ -916,10 +1066,19 @@ export interface ContactPage {
      * Marks this hero as the above-the-fold image the front end should preload.
      */
     priority?: boolean | null;
+    /**
+     * Small line displayed above the title.
+     */
     kicker?: string | null;
     title?: string | null;
+    /**
+     * Supporting line shown beneath the title.
+     */
     sub?: string | null;
   };
+  /**
+   * Welcoming message that invites visitors to reach out.
+   */
   invitation?: {
     root: {
       type: string;
@@ -935,6 +1094,9 @@ export interface ContactPage {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Interactive map pin and directions.
+   */
   map: {
     /**
      * Pin latitude, for example 40.1969.
@@ -959,8 +1121,17 @@ export interface ContactPage {
     staticPreview?: (number | null) | Media;
   };
   seo?: {
+    /**
+     * Shown in browser tabs and search results. Aim for under 60 characters.
+     */
     title?: string | null;
+    /**
+     * Search result snippet. Aim for 150–160 characters.
+     */
     description?: string | null;
+    /**
+     * Preview image used when the page is shared on social media (1200×630 recommended).
+     */
     ogImage?: (number | null) | Media;
   };
   updatedAt?: string | null;

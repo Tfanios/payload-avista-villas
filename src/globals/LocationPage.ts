@@ -2,7 +2,7 @@ import type { GlobalConfig } from 'payload'
 
 import { canReadPublicly, isAuthenticated } from '../access/isAuthenticated'
 import { mapLocation } from '../fields/mapLocation'
-import { heroFields, linkFields, locationFactFields, seoFields } from '../fields/shared'
+import { crossLinksField, heroFields, locationFactsField, seoFields } from '../fields/shared'
 
 export const LocationPage: GlobalConfig = {
   slug: 'locationPage',
@@ -16,31 +16,48 @@ export const LocationPage: GlobalConfig = {
   },
   fields: [
     {
-      name: 'hero',
-      type: 'group',
-      fields: heroFields,
-    },
-    { name: 'overview', type: 'richText' },
-    {
-      name: 'locationFacts',
-      type: 'array',
-      fields: locationFactFields,
-    },
-    {
-      name: 'map',
-      type: 'group',
-      fields: mapLocation,
-    },
-    {
-      name: 'crossLinks',
-      type: 'array',
-      maxRows: 2,
-      fields: linkFields,
-    },
-    {
-      name: 'seo',
-      type: 'group',
-      fields: seoFields,
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Content',
+          description: 'Everything visitors see on the location page, top to bottom.',
+          fields: [
+            {
+              name: 'hero',
+              type: 'group',
+              label: 'Hero',
+              admin: { description: 'The full-width banner at the top of the page.' },
+              fields: heroFields,
+            },
+            {
+              name: 'overview',
+              type: 'richText',
+              admin: { description: 'Introductory description of the location.' },
+            },
+            locationFactsField,
+            {
+              name: 'map',
+              type: 'group',
+              label: 'Map',
+              admin: { description: 'Interactive map pin and directions.' },
+              fields: mapLocation,
+            },
+            crossLinksField,
+          ],
+        },
+        {
+          label: 'SEO',
+          description: 'Search engine and social sharing metadata.',
+          fields: [
+            {
+              name: 'seo',
+              type: 'group',
+              label: false,
+              fields: seoFields,
+            },
+          ],
+        },
+      ],
     },
   ],
 }

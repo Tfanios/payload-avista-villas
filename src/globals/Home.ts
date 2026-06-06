@@ -2,10 +2,10 @@ import type { GlobalConfig } from 'payload'
 
 import { canReadPublicly, isAuthenticated } from '../access/isAuthenticated'
 import {
-  galleryFields,
+  galleryField,
   heroFields,
-  locationFactFields,
-  serviceFields,
+  locationFactsField,
+  servicesField,
   seoFields,
 } from '../fields/shared'
 
@@ -21,47 +21,64 @@ export const Home: GlobalConfig = {
   },
   fields: [
     {
-      name: 'hero',
-      type: 'group',
-      fields: heroFields,
-    },
-    {
-      name: 'intro',
-      type: 'group',
-      fields: [
-        { name: 'lead', type: 'textarea' },
-        { name: 'statement', type: 'richText' },
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Content',
+          description: 'Everything visitors see on the home page, top to bottom.',
+          fields: [
+            {
+              name: 'hero',
+              type: 'group',
+              label: 'Hero',
+              admin: { description: 'The full-width banner at the top of the page.' },
+              fields: heroFields,
+            },
+            {
+              name: 'intro',
+              type: 'group',
+              label: 'Introduction',
+              admin: { description: 'Opening statement shown below the hero.' },
+              fields: [
+                { name: 'lead', type: 'textarea', admin: { description: 'Short lead-in sentence.' } },
+                { name: 'statement', type: 'richText' },
+              ],
+            },
+            galleryField,
+            servicesField,
+            {
+              name: 'locationSummary',
+              type: 'textarea',
+              label: 'Location summary',
+              admin: { description: 'Intro paragraph for the location section.' },
+            },
+            locationFactsField,
+            {
+              name: 'cta',
+              type: 'group',
+              label: 'Call to action',
+              admin: { description: 'Closing prompt that encourages visitors to get in touch.' },
+              fields: [
+                { name: 'title', type: 'text' },
+                { name: 'body', type: 'textarea' },
+                { name: 'buttonLabel', type: 'text', label: 'Button label' },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'SEO',
+          description: 'Search engine and social sharing metadata.',
+          fields: [
+            {
+              name: 'seo',
+              type: 'group',
+              label: false,
+              fields: seoFields,
+            },
+          ],
+        },
       ],
-    },
-    {
-      name: 'gallery',
-      type: 'array',
-      fields: galleryFields,
-    },
-    {
-      name: 'services',
-      type: 'array',
-      fields: serviceFields,
-    },
-    { name: 'locationSummary', type: 'textarea' },
-    {
-      name: 'locationFacts',
-      type: 'array',
-      fields: locationFactFields,
-    },
-    {
-      name: 'cta',
-      type: 'group',
-      fields: [
-        { name: 'title', type: 'text' },
-        { name: 'body', type: 'textarea' },
-        { name: 'buttonLabel', type: 'text' },
-      ],
-    },
-    {
-      name: 'seo',
-      type: 'group',
-      fields: seoFields,
     },
   ],
 }

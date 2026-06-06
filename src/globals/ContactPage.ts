@@ -16,20 +16,46 @@ export const ContactPage: GlobalConfig = {
   },
   fields: [
     {
-      name: 'hero',
-      type: 'group',
-      fields: heroFields,
-    },
-    { name: 'invitation', type: 'richText' },
-    {
-      name: 'map',
-      type: 'group',
-      fields: mapLocation,
-    },
-    {
-      name: 'seo',
-      type: 'group',
-      fields: seoFields,
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Content',
+          description: 'Everything visitors see on the contact page, top to bottom.',
+          fields: [
+            {
+              name: 'hero',
+              type: 'group',
+              label: 'Hero',
+              admin: { description: 'The full-width banner at the top of the page.' },
+              fields: heroFields,
+            },
+            {
+              name: 'invitation',
+              type: 'richText',
+              admin: { description: 'Welcoming message that invites visitors to reach out.' },
+            },
+            {
+              name: 'map',
+              type: 'group',
+              label: 'Map',
+              admin: { description: 'Interactive map pin and directions.' },
+              fields: mapLocation,
+            },
+          ],
+        },
+        {
+          label: 'SEO',
+          description: 'Search engine and social sharing metadata.',
+          fields: [
+            {
+              name: 'seo',
+              type: 'group',
+              label: false,
+              fields: seoFields,
+            },
+          ],
+        },
+      ],
     },
   ],
 }
