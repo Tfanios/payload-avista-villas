@@ -1,5 +1,9 @@
 :root {
-  --font-mono: 'Roboto Mono', monospace;
+  --avista-bg: #0c0b0a;
+  --avista-accent: #b08d57;
+  --avista-accent-strong: #c8a36a;
+  --avista-text: #f4efe8;
+  --avista-muted: #9a9389;
 }
 
 * {
@@ -9,8 +13,7 @@
 html {
   font-size: 18px;
   line-height: 32px;
-
-  background: rgb(0, 0, 0);
+  background: var(--avista-bg);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -21,12 +24,11 @@ body,
 }
 
 body {
-  font-family: system-ui;
+  font-family: system-ui, sans-serif;
   font-size: 18px;
   line-height: 32px;
-
   margin: 0;
-  color: rgb(1000, 1000, 1000);
+  color: var(--avista-text);
 
   @media (max-width: 1024px) {
     font-size: 15px;
@@ -40,53 +42,13 @@ img {
   display: block;
 }
 
-h1 {
-  margin: 40px 0;
-  font-size: 64px;
-  line-height: 70px;
-  font-weight: bold;
-
-  @media (max-width: 1024px) {
-    margin: 24px 0;
-    font-size: 42px;
-    line-height: 42px;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 38px;
-    line-height: 38px;
-  }
-
-  @media (max-width: 400px) {
-    font-size: 32px;
-    line-height: 32px;
-  }
-}
-
-p {
-  margin: 24px 0;
-
-  @media (max-width: 1024px) {
-    margin: calc(var(--base) * 0.75) 0;
-  }
-}
-
 a {
   color: currentColor;
 
-  &:focus {
-    opacity: 0.8;
-    outline: none;
-  }
-
+  &:focus,
   &:active {
-    opacity: 0.7;
     outline: none;
   }
-}
-
-svg {
-  vertical-align: middle;
 }
 
 .home {
@@ -94,11 +56,14 @@ svg {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  height: 100vh;
-  padding: 45px;
+  min-height: 100vh;
+  padding: 48px;
   max-width: 1024px;
   margin: 0 auto;
-  overflow: hidden;
+
+  // Subtle warm glow behind the content.
+  background:
+    radial-gradient(circle at 50% 28%, rgba(176, 141, 87, 0.14), transparent 55%);
 
   @media (max-width: 400px) {
     padding: 24px;
@@ -109,10 +74,54 @@ svg {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
     flex-grow: 1;
+  }
 
-    h1 {
-      text-align: center;
+  .logo {
+    height: 96px;
+    width: auto;
+    margin-bottom: 28px;
+
+    @media (max-width: 768px) {
+      height: 72px;
+    }
+  }
+
+  .eyebrow {
+    margin: 0 0 4px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--avista-accent);
+  }
+
+  h1 {
+    margin: 8px 0 16px;
+    font-size: 64px;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+
+    @media (max-width: 1024px) {
+      font-size: 46px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 36px;
+    }
+  }
+
+  .tagline {
+    margin: 0 0 36px;
+    max-width: 44ch;
+    color: var(--avista-muted);
+    font-size: 18px;
+    line-height: 1.6;
+
+    @media (max-width: 768px) {
+      font-size: 16px;
     }
   }
 
@@ -120,45 +129,36 @@ svg {
     display: flex;
     align-items: center;
     gap: 12px;
+  }
 
-    a {
-      text-decoration: none;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-    }
+  .admin {
+    display: inline-block;
+    text-decoration: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #1a1714;
+    background: var(--avista-accent);
+    border: 1px solid var(--avista-accent);
+    transition:
+      background 0.15s ease,
+      transform 0.15s ease;
 
-    .admin {
-      color: rgb(0, 0, 0);
-      background: rgb(1000, 1000, 1000);
-      border: 1px solid rgb(0, 0, 0);
-    }
-
-    .docs {
-      color: rgb(1000, 1000, 1000);
-      background: rgb(0, 0, 0);
-      border: 1px solid rgb(1000, 1000, 1000);
+    &:hover {
+      background: var(--avista-accent-strong);
+      border-color: var(--avista-accent-strong);
+      transform: translateY(-1px);
     }
   }
 
   .footer {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    @media (max-width: 1024px) {
-      flex-direction: column;
-      gap: 6px;
-    }
+    padding-top: 24px;
 
     p {
       margin: 0;
-    }
-
-    .codeLink {
-      text-decoration: none;
-      padding: 0 0.5rem;
-      background: rgb(60, 60, 60);
-      border-radius: 4px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      color: var(--avista-muted);
     }
   }
 }
