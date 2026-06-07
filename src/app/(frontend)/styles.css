@@ -61,7 +61,7 @@ a {
   max-width: 1024px;
   margin: 0 auto;
 
-  // Subtle warm glow behind the content.
+  /* Subtle warm glow behind the content. */
   background:
     radial-gradient(circle at 50% 28%, rgba(176, 141, 87, 0.14), transparent 55%);
 
