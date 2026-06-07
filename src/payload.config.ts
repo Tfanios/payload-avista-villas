@@ -61,6 +61,17 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      titleSuffix: '— Avista Villas',
+    },
+    components: {
+      graphics: {
+        Logo: '/components/admin/Logo#Logo',
+        Icon: '/components/admin/Icon#Icon',
+      },
+      beforeLogin: ['/components/admin/BeforeLogin#BeforeLogin'],
+      beforeDashboard: ['/components/admin/BeforeDashboard#BeforeDashboard'],
+    },
   },
   collections: [Users, Media, Properties, Reviews, Enquiries],
   globals: [SiteSettings, Navigation, Footer, Home, LocationPage, ContactPage],

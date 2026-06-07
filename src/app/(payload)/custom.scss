@@ -1,0 +1,177 @@
+// ---------------------------------------------------------------------------
+// Avista Villas — admin branding
+// ---------------------------------------------------------------------------
+
+// Brand accent. Adjust to match the marketing site palette.
+:root {
+  --avista-accent: #b08d57; // warm gold
+  --avista-accent-strong: #9a784a;
+  --avista-accent-contrast: #ffffff;
+}
+
+// --- Logo / Icon -----------------------------------------------------------
+
+.avista-logo {
+  display: block;
+  width: auto;
+  height: 76px;
+}
+
+.avista-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+// ===========================================================================
+// Pre-login pages (login, forgot password, reset password,
+// create first user, unlock) — all rendered inside `.template-minimal`.
+// ===========================================================================
+
+.template-minimal {
+  // Branded full-screen backdrop behind the auth card.
+  background:
+    radial-gradient(circle at 12% 8%, rgba(176, 141, 87, 0.18), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(176, 141, 87, 0.12), transparent 40%),
+    var(--theme-bg);
+
+  // Turn the inner wrapper into a centered branded card.
+  &__wrap {
+    width: 100%;
+    max-width: 440px;
+    margin-inline: auto;
+    padding: calc(var(--base) * 1.75) calc(var(--base) * 1.75) calc(var(--base) * 1.5);
+    border: 1px solid var(--theme-elevation-100);
+    border-radius: 16px;
+    background: var(--theme-elevation-0);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 24px 48px -24px rgba(0, 0, 0, 0.25);
+  }
+
+  // Brand the primary action button (Login, Reset, Create, etc.).
+  .btn--style-primary {
+    background-color: var(--avista-accent);
+    border-color: var(--avista-accent);
+
+    &:hover,
+    &:focus {
+      background-color: var(--avista-accent-strong);
+      border-color: var(--avista-accent-strong);
+    }
+  }
+
+  // Brand inline links (forgot password, back to login, etc.).
+  a:not(.btn) {
+    color: var(--avista-accent-strong);
+  }
+
+  // Pages other than login don't render the logo — inject it via the
+  // shared SVG so every pre-login page is branded consistently.
+  &__wrap:not(:has(.login__brand))::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 76px;
+    margin-bottom: calc(var(--base) * 1.25);
+    background: url('/avista-logo.svg') center / contain no-repeat;
+  }
+}
+
+// Login view: logo lockup centered above the form.
+.login__brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: calc(var(--base) * 1.25);
+}
+
+.avista-login-intro {
+  margin-bottom: var(--base);
+  text-align: center;
+
+  &__eyebrow {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--avista-accent);
+  }
+
+  &__title {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--theme-elevation-1000);
+  }
+
+  &__copy {
+    margin: 0 auto;
+    max-width: 32ch;
+    color: var(--theme-elevation-600);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+}
+
+// ===========================================================================
+// Dashboard — quick actions panel
+// ===========================================================================
+
+.avista-dashboard-intro {
+  margin-bottom: calc(var(--base) * 1.5);
+
+  &__header {
+    margin-bottom: var(--base);
+  }
+
+  &__title {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--theme-elevation-1000);
+  }
+
+  &__copy {
+    margin: 0;
+    color: var(--theme-elevation-500);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+}
+
+.avista-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 10px;
+  background: var(--theme-elevation-50);
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover {
+    border-color: var(--avista-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  &__label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--theme-elevation-1000);
+  }
+
+  &__desc {
+    font-size: 13px;
+    color: var(--theme-elevation-500);
+  }
+}
