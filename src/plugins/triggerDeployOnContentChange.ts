@@ -1,4 +1,5 @@
 import type {
+  Access,
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
   GlobalAfterChangeHook,
@@ -6,7 +7,7 @@ import type {
   Plugin,
 } from 'payload'
 
-const publicCollectionSlugs = new Set(['media', 'properties', 'reviews'])
+const publishableCollectionSlugs = new Set(['properties', 'reviews'])
 const publicGlobalSlugs = new Set([
   'siteSettings',
   'navigation',
@@ -15,6 +16,23 @@ const publicGlobalSlugs = new Set([
   'locationPage',
   'contactPage',
 ])
+
+const isAuthenticated: Access = ({ req }) => Boolean(req.user)
+const isTrue = (value: unknown): boolean => value === true || value === 'true'
+
+const canReadPublishedCollection: Access = ({ req }) =>
+  req.user
+    ? true
+    : {
+        _status: {
+          equals: 'published',
+        },
+      }
+
+const canReadPublishedGlobal: Access = ({ req }) => Boolean(req.user) || !isTrue(req.query.draft)
+
+const changesPublishedContent = (doc: Record<string, unknown>, req: PayloadRequest): boolean =>
+  doc._status === 'published' || isTrue(req.query.unpublishAllLocales)
 
 const triggerDeploy = async (req: PayloadRequest, source: string): Promise<void> => {
   const deployHook = process.env.DEPLOY_HOOK
@@ -49,7 +67,11 @@ const triggerDeploy = async (req: PayloadRequest, source: string): Promise<void>
 
 const collectionAfterChange =
   (slug: string): CollectionAfterChangeHook =>
-  async ({ req }) => {
+  async ({ doc, req }) => {
+    if (!changesPublishedContent(doc, req)) {
+      return
+    }
+
     await triggerDeploy(req, `collection:${slug}`)
   }
 
@@ -61,18 +83,33 @@ const collectionAfterDelete =
 
 const globalAfterChange =
   (slug: string): GlobalAfterChangeHook =>
-  async ({ req }) => {
+  async ({ doc, req }) => {
+    if (!changesPublishedContent(doc, req)) {
+      return
+    }
+
     await triggerDeploy(req, `global:${slug}`)
   }
 
 export const triggerDeployOnContentChange: Plugin = (config) => {
   config.collections = config.collections?.map((collection) => {
-    if (!publicCollectionSlugs.has(collection.slug)) {
+    if (!publishableCollectionSlugs.has(collection.slug)) {
       return collection
     }
 
     return {
       ...collection,
+      access: {
+        ...collection.access,
+        read: canReadPublishedCollection,
+        readVersions: isAuthenticated,
+      },
+      versions: {
+        drafts: {
+          validate: true,
+        },
+        maxPerDoc: 20,
+      },
       hooks: {
         ...collection.hooks,
         afterChange: [
@@ -94,6 +131,17 @@ export const triggerDeployOnContentChange: Plugin = (config) => {
 
     return {
       ...global,
+      access: {
+        ...global.access,
+        read: canReadPublishedGlobal,
+        readVersions: isAuthenticated,
+      },
+      versions: {
+        drafts: {
+          validate: true,
+        },
+        max: 20,
+      },
       hooks: {
         ...global.hooks,
         afterChange: [...(global.hooks?.afterChange ?? []), globalAfterChange(global.slug)],

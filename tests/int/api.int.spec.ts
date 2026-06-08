@@ -3,7 +3,7 @@
 import { getPayload, type Payload } from 'payload'
 import config, { disposeLocalCloudflareContext } from '@/payload.config'
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 let payload: Payload
 
@@ -47,6 +47,54 @@ describe('API', () => {
       navigation: 'Site',
       footer: 'Site',
     })
+  })
+
+  it('enables drafts and version history for publishable content', () => {
+    const publishableCollections = payload.config.collections.filter(({ slug }) =>
+      ['properties', 'reviews'].includes(slug),
+    )
+
+    expect(
+      publishableCollections.every(
+        (collection) => collection.versions?.drafts && collection.versions.drafts.validate === true,
+      ),
+    ).toBe(true)
+    expect(
+      payload.config.globals.every(
+        (global) => global.versions?.drafts && global.versions.drafts.validate === true,
+      ),
+    ).toBe(true)
+  })
+
+  it('triggers deploys for publish and unpublish but not draft saves', async () => {
+    const properties = payload.config.collections.find(({ slug }) => slug === 'properties')
+    const afterChange = properties?.hooks?.afterChange?.at(-1)
+    const originalDeployHook = process.env.DEPLOY_HOOK
+    process.env.DEPLOY_HOOK = 'https://example.com/deploy'
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response(null, { status: 200 }))
+
+    try {
+      await afterChange?.({ doc: { _status: 'draft' }, req: { payload, query: {} } } as never)
+      expect(fetchMock).not.toHaveBeenCalled()
+
+      await afterChange?.({ doc: { _status: 'published' }, req: { payload, query: {} } } as never)
+      expect(fetchMock).toHaveBeenCalledWith(process.env.DEPLOY_HOOK, { method: 'POST' })
+
+      await afterChange?.({
+        doc: { _status: 'draft' },
+        req: { payload, query: { unpublishAllLocales: 'true' } },
+      } as never)
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+    } finally {
+      fetchMock.mockRestore()
+      if (originalDeployHook === undefined) {
+        delete process.env.DEPLOY_HOOK
+      } else {
+        process.env.DEPLOY_HOOK = originalDeployHook
+      }
+    }
   })
 
   it('keeps the disabled R2 direct-upload handler out of the admin bundle', () => {
