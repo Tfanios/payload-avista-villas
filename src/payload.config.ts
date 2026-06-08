@@ -21,6 +21,7 @@ import { Navigation } from './globals/Navigation'
 import { SiteSettings } from './globals/SiteSettings'
 import { migrations } from './migrations'
 import { removeDisabledR2ClientUploadProvider } from './plugins/removeDisabledR2ClientUploadProvider'
+import { triggerDeployOnContentChange } from './plugins/triggerDeployOnContentChange'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -92,6 +93,7 @@ export default buildConfig({
       collections: { media: true },
     }),
     removeDisabledR2ClientUploadProvider,
+    triggerDeployOnContentChange,
   ],
 })
 
