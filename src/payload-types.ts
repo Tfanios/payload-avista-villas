@@ -808,6 +808,24 @@ export interface Home {
     } | null;
   };
   /**
+   * Frames the villa comparison section. Optional section copy, plus which villas to feature and in what order.
+   */
+  villas?: {
+    /**
+     * Small line displayed above the title.
+     */
+    kicker?: string | null;
+    title?: string | null;
+    /**
+     * Short intro paragraph for the section.
+     */
+    body?: string | null;
+    /**
+     * Villas shown on the home page, in this order. Leave empty to show all properties by their order.
+     */
+    featured?: (number | Property)[] | null;
+  };
+  /**
    * Images shown in the page gallery, in order.
    */
   gallery?:
@@ -1248,6 +1266,14 @@ export interface HomeSelect<T extends boolean = true> {
     | {
         lead?: T;
         statement?: T;
+      };
+  villas?:
+    | T
+    | {
+        kicker?: T;
+        title?: T;
+        body?: T;
+        featured?: T;
       };
   gallery?:
     | T

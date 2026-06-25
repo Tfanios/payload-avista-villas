@@ -40,8 +40,45 @@ export const Home: GlobalConfig = {
               label: 'Introduction',
               admin: { description: 'Opening statement shown below the hero.' },
               fields: [
-                { name: 'lead', type: 'textarea', admin: { description: 'Short lead-in sentence.' } },
+                {
+                  name: 'lead',
+                  type: 'textarea',
+                  admin: { description: 'Short lead-in sentence.' },
+                },
                 { name: 'statement', type: 'richText' },
+              ],
+            },
+            {
+              name: 'villas',
+              type: 'group',
+              label: 'Villas comparison',
+              admin: {
+                description:
+                  'Frames the villa comparison section. Optional section copy, plus which villas to feature and in what order.',
+              },
+              fields: [
+                {
+                  name: 'kicker',
+                  type: 'text',
+                  admin: { description: 'Small line displayed above the title.' },
+                },
+                { name: 'title', type: 'text' },
+                {
+                  name: 'body',
+                  type: 'textarea',
+                  admin: { description: 'Short intro paragraph for the section.' },
+                },
+                {
+                  name: 'featured',
+                  type: 'relationship',
+                  relationTo: 'properties',
+                  hasMany: true,
+                  label: 'Featured villas',
+                  admin: {
+                    description:
+                      'Villas shown on the home page, in this order. Leave empty to show all properties by their order.',
+                  },
+                },
               ],
             },
             galleryField,
