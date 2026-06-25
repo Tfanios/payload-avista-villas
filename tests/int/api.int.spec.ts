@@ -2,10 +2,51 @@
 
 import { getPayload, type Payload } from 'payload'
 import config, { disposeLocalCloudflareContext } from '@/payload.config'
+import type { LocationPage } from '@/payload-types'
 
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 let payload: Payload
+type LocalGuide = LocationPage['localGuide']
+
+const editableGuide = (): LocalGuide => ({
+  enabled: false,
+  title: 'Edited local guide',
+  intro: 'Editor-managed recommendations.',
+  note: '',
+  categories: [
+    {
+      title: 'Restaurants',
+      description: 'Dinner recommendations.',
+      places: [
+        {
+          name: 'Melia',
+          description: 'Dinner beneath the trees',
+          area: 'Vourvourou',
+          href: 'https://www.google.com/maps/search/?api=1&query=Melia+Restaurant+Vourvourou',
+        },
+        {
+          name: 'Paris Restaurant',
+          description: 'Greek cooking and grilled seafood',
+          area: 'Vourvourou',
+          href: 'https://www.google.com/maps/search/?api=1&query=Paris+Restaurant+Vourvourou',
+        },
+      ],
+    },
+    {
+      title: 'Beaches',
+      description: 'Nearby swimming spots.',
+      places: [
+        {
+          name: 'Karidi Beach',
+          description: 'Pale sand, pines and calm shallows',
+          area: 'Vourvourou',
+          href: 'https://www.google.com/maps/search/?api=1&query=Karidi+Beach+Vourvourou',
+        },
+      ],
+    },
+  ],
+})
 
 describe('API', () => {
   beforeAll(async () => {
@@ -118,6 +159,137 @@ describe('API', () => {
     })
 
     expect(properties.docs).toBeDefined()
+  })
+
+  it('allows public users to read the seeded local guide', async () => {
+    const locationPage = await payload.findGlobal({
+      slug: 'locationPage',
+      overrideAccess: false,
+    })
+
+    expect(locationPage.localGuide).toMatchObject({
+      enabled: true,
+      title: 'A few places\nto begin.',
+      note: 'Each name opens in Google Maps.',
+    })
+    expect(locationPage.localGuide.categories).toHaveLength(3)
+    expect(locationPage.localGuide.categories?.map(({ title }) => title)).toEqual([
+      'Beaches',
+      'Restaurants',
+      'Bars by the water',
+    ])
+    expect(locationPage.localGuide.categories?.flatMap(({ places }) => places ?? [])).toHaveLength(
+      9,
+    )
+  })
+
+  it('allows editors to reorder, update, and remove local guide entries', async () => {
+    const original = await payload.findGlobal({
+      slug: 'locationPage',
+      draft: true,
+    })
+    const editor = {
+      id: 1,
+      collection: 'users',
+      email: 'editor@example.com',
+    }
+
+    try {
+      const reordered = await payload.updateGlobal({
+        slug: 'locationPage',
+        data: {
+          localGuide: editableGuide(),
+        },
+        draft: true,
+        overrideAccess: false,
+        overrideLock: true,
+        user: editor as never,
+      })
+
+      expect(reordered.localGuide.enabled).toBe(false)
+      expect(reordered.localGuide.note === '' || reordered.localGuide.note == null).toBe(true)
+      expect(reordered.localGuide.categories?.map(({ title }) => title)).toEqual([
+        'Restaurants',
+        'Beaches',
+      ])
+      expect(reordered.localGuide.categories?.[0]?.places?.map(({ name }) => name)).toEqual([
+        'Melia',
+        'Paris Restaurant',
+      ])
+
+      const reduced = await payload.updateGlobal({
+        slug: 'locationPage',
+        data: {
+          localGuide: {
+            ...editableGuide(),
+            title: 'Reduced local guide',
+            categories: [
+              editableGuide().categories?.[1] as NonNullable<LocalGuide['categories']>[0],
+            ],
+          },
+        },
+        draft: true,
+        overrideAccess: false,
+        overrideLock: true,
+        user: editor as never,
+      })
+
+      expect(reduced.localGuide.title).toBe('Reduced local guide')
+      expect(reduced.localGuide.categories).toHaveLength(1)
+      expect(reduced.localGuide.categories?.[0]?.places).toHaveLength(1)
+    } finally {
+      await payload.updateGlobal({
+        slug: 'locationPage',
+        data: {
+          localGuide: original.localGuide,
+        },
+        draft: true,
+        overrideAccess: true,
+        overrideLock: true,
+      })
+    }
+  })
+
+  it('rejects invalid and non-HTTPS local guide map URLs', async () => {
+    const invalidGuide = editableGuide()
+    const invalidPlace = invalidGuide.categories?.[0]?.places?.[0]
+
+    if (!invalidPlace) {
+      throw new Error('Local guide test fixture is missing a place')
+    }
+
+    invalidPlace.href = 'not-a-url'
+    await expect(
+      payload.updateGlobal({
+        slug: 'locationPage',
+        data: { localGuide: invalidGuide },
+        draft: true,
+        overrideAccess: true,
+        overrideLock: true,
+      }),
+    ).rejects.toThrow()
+
+    invalidPlace.href = 'http://www.google.com/maps/search/?api=1&query=Melia+Restaurant+Vourvourou'
+    await expect(
+      payload.updateGlobal({
+        slug: 'locationPage',
+        data: { localGuide: invalidGuide },
+        draft: true,
+        overrideAccess: true,
+        overrideLock: true,
+      }),
+    ).rejects.toThrow()
+
+    invalidPlace.href = 'https://example.com/not-google-maps'
+    await expect(
+      payload.updateGlobal({
+        slug: 'locationPage',
+        data: { localGuide: invalidGuide },
+        draft: true,
+        overrideAccess: true,
+        overrideLock: true,
+      }),
+    ).rejects.toThrow()
   })
 
   it('allows public enquiry creation but protects enquiry reads', async () => {

@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 
 import { canReadPublicly, isAuthenticated } from '../access/isAuthenticated'
+import { localGuideField } from '../fields/localGuide'
 import { mapLocation } from '../fields/mapLocation'
 import { crossLinksField, heroFields, locationFactsField, seoFields } from '../fields/shared'
 
@@ -42,6 +43,7 @@ export const LocationPage: GlobalConfig = {
               admin: { description: 'Interactive map pin and directions.' },
               fields: mapLocation,
             },
+            localGuideField,
             crossLinksField,
           ],
         },

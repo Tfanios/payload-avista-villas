@@ -1025,6 +1025,31 @@ export interface LocationPage {
      */
     staticPreview?: (number | null) | Media;
   };
+  localGuide: {
+    enabled?: boolean | null;
+    /**
+     * Supports a newline for the intended heading break.
+     */
+    title: string;
+    intro: string;
+    note?: string | null;
+    categories?:
+      | {
+          title: string;
+          description: string;
+          places?:
+            | {
+                name: string;
+                description: string;
+                area: string;
+                href: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
   /**
    * Up to two links to related pages.
    */
@@ -1354,6 +1379,30 @@ export interface LocationPageSelect<T extends boolean = true> {
         label?: T;
         directionsQuery?: T;
         staticPreview?: T;
+      };
+  localGuide?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        intro?: T;
+        note?: T;
+        categories?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              places?:
+                | T
+                | {
+                    name?: T;
+                    description?: T;
+                    area?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
       };
   crossLinks?:
     | T
