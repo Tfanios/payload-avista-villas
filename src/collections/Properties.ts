@@ -16,6 +16,11 @@ export const Properties: CollectionConfig = {
     group: 'Content',
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'order'],
+    components: {
+      beforeList: [
+        '/components/admin/EnsureVisibleListColumns#EnsureVisibleListColumns',
+      ],
+    },
   },
   access: {
     create: isAuthenticated,

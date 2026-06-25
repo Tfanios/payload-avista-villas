@@ -8,6 +8,11 @@ export const Reviews: CollectionConfig = {
     group: 'Content',
     useAsTitle: 'authorName',
     defaultColumns: ['authorName', 'property', 'score', 'featured'],
+    components: {
+      beforeList: [
+        '/components/admin/EnsureVisibleListColumns#EnsureVisibleListColumns',
+      ],
+    },
   },
   access: {
     create: isAuthenticated,

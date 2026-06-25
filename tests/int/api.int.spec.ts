@@ -95,6 +95,17 @@ describe('API', () => {
 
     expect(properties?.admin?.useAsTitle).toBe('name')
     expect(properties?.admin?.defaultColumns).toEqual(['name', 'slug', 'order'])
+    expect(properties?.admin?.components?.beforeList).toEqual([
+      '/components/admin/EnsureVisibleListColumns#EnsureVisibleListColumns',
+    ])
+  })
+
+  it('repairs invalid review-list column preferences', () => {
+    const reviews = payload.config.collections.find(({ slug }) => slug === 'reviews')
+
+    expect(reviews?.admin?.components?.beforeList).toEqual([
+      '/components/admin/EnsureVisibleListColumns#EnsureVisibleListColumns',
+    ])
   })
 
   it('enables drafts and version history for publishable content', () => {
