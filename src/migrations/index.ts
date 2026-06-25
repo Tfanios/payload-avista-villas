@@ -4,6 +4,7 @@ import * as migration_20260608_191322_publish_workflow from './20260608_191322_p
 import * as migration_20260625_163915_home_villas_section from './20260625_163915_home_villas_section'
 import * as migration_20260625_201145_backfill_collection_versions from './20260625_201145_backfill_collection_versions'
 import * as migration_20260625_205145_location_local_guide from './20260625_205145_location_local_guide'
+import * as migration_20260625_213750_reset_content_list_preferences from './20260625_213750_reset_content_list_preferences'
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20260625_205145_location_local_guide.up,
     down: migration_20260625_205145_location_local_guide.down,
     name: '20260625_205145_location_local_guide',
+  },
+  {
+    up: migration_20260625_213750_reset_content_list_preferences.up,
+    down: migration_20260625_213750_reset_content_list_preferences.down,
+    name: '20260625_213750_reset_content_list_preferences',
   },
 ]

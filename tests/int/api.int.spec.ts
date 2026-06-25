@@ -90,6 +90,13 @@ describe('API', () => {
     })
   })
 
+  it('keeps villa titles as the first clickable property-list column', () => {
+    const properties = payload.config.collections.find(({ slug }) => slug === 'properties')
+
+    expect(properties?.admin?.useAsTitle).toBe('name')
+    expect(properties?.admin?.defaultColumns).toEqual(['name', 'slug', 'order'])
+  })
+
   it('enables drafts and version history for publishable content', () => {
     const publishableCollections = payload.config.collections.filter(({ slug }) =>
       ['properties', 'reviews'].includes(slug),
